@@ -2,3 +2,5 @@
 .idea
 
 pkg
+src/github.com/360EntSecGroup-Skylar/excelize/
+src/github.com/mohae/deepcopy/
