@@ -1,0 +1,1 @@
+python merge_and_compress_json.py

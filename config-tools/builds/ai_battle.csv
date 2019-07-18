@@ -1,0 +1,10 @@
+ai_battle
+id|number miss|number head|number body|number horse_head|number horse_body|number weak|number full|number time_min|number time_max|number
+1 150 50 150 50 100 0 40 5 10
+2 150 50 150 50 100 30 40 5 10
+3 100 50 100 50 100 50 60 5 8
+4 100 100 150 50 25 100 60 5 8
+5 100 100 150 50 25 100 80 4 8
+6 100 100 150 50 25 100 80 4 8
+7 50 150 50 50 20 100 100 4 6
+8 0 100 50 50 25 100 100 4 6
