@@ -215,7 +215,7 @@ func parseSheet(excel *excelize.File, sheet string) {
 	var strTypes string
 	for _, i := range effectiveColumns {
 		strNames += " " + names[i]
-		strTypes += " " + types[i]
+		strTypes += " " + getTargetLangType(types[i])
 	}
 	_, _ = buffer.WriteString(strNames[1:])
 	_, _ = buffer.WriteString("\n" + strTypes[1:])
