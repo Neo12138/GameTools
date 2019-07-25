@@ -1,6 +1,6 @@
 AIBattle
 id miss head body horse_head horse_body weak full time_min time_max
-int int int int int int int int int int
+number number number number number number number number number number
 1 150 50 150 50 100 0 40 5 10
 2 150 50 150 50 100 30 40 5 10
 3 100 50 100 50 100 50 60 5 8

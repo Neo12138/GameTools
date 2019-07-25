@@ -1,6 +1,6 @@
 Landing
 id day gift
-int int int
+number number number
 1 1 10001
 2 2 10001
 3 3 10001

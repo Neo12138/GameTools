@@ -1,6 +1,6 @@
 ChangeServer
 id name ip port
-int string string string
+number string string string
 1 谢志峰 192.168.1.64 20013
 2 缪树江 192.168.1.227 20013
 3 安嘉斌 192.168.1.163 20013
