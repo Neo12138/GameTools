@@ -1,7 +1,7 @@
 /**
- * 将excel 导出为文本格式的配置表
+ * 将excel配置表导出为纯文本格式配置表
  */
-package tools
+package export
 
 import (
 	"bufio"
@@ -12,100 +12,128 @@ import (
 	"os"
 	"strings"
 	"time"
+	"utils"
 )
 
 //可以是绝对路径
 type Setting struct {
-	SourceDir        string
-	OutDir           string
-	DefOutDir        string
-	ImportSuffix     string
-	ExportFlag       string
-	ExportSuffix     string
-	ConfigMoveTo     string
-	DefMoveTo        string
-	ConfigNamespace  string
+	//excel表的所在的目录，相对路径或绝对路径
+	SourceDir string
+	//excel表的后缀名
+	SourceSuffix string
+	//导出标志，excel中某些列是不需要导出的
+	ExportFlag string
+	//导出目录
+	OutDir string
+	//导出文件后缀
+	ExportSuffix string
+	//配置表数据的类型定义文件(.d.ts)文件导出目录
+	DefOutDir string
+	//配置表数据所在的名字空间
+	DefNamespace string
+	//配置表 表名文件导出目录
 	ConfigNameOutDir string
+	//配置表 表名文件所在的名字空间
+	ConfigNameNamespace string
 }
 
 var setting Setting
-
-var jsTypeMap = map[string]string{
-	"int":      "number",
-	"float":    "number",
-	"string":   "string",
-	"bool":     "boolean",
-	"int[]":    "number[]",
-	"float[]":  "number[]",
-	"string[]": "string[]",
-	"bool[]":   "boolean[]",
-
-	"float64":        "number",
-	"interface {}":   "any",
-	"[]interface {}": "any[]",
-}
-var encodeMap = map[string]string{
-	" ":   "%20",
-	"\\n": "%0A",
-	"\\t": "%09",
-}
-
+var tsTypeMap map[string]string
+var encodeMap map[string]string
 var failCount = 0
 var failDesc string
 var dtsConfigMapDeclare string
 var dts *os.File
 var dtsBuffer *bufio.Writer
+var fName *os.File
+var bufferName *bufio.Writer
 
 func Run(args []string) {
-	setting = Setting{
-		SourceDir:        "./tables/",
-		OutDir:           "./configs/",
-		DefOutDir:        "./def/",
-		ImportSuffix:     ".xlsx|.xls",
-		ExportFlag:       "C",
-		ExportSuffix:     ".txt",
-		ConfigMoveTo:     "C:/Users/admin/Desktop/configs-move/",
-		DefMoveTo:        "./def-move/",
-		ConfigNamespace:  "ConfigData",
-		ConfigNameOutDir: "",
-	}
-
+	initData()
 	readStartupParams(args)
-
 	readFiles()
 }
+
+/*初始化配置数据*/
+func initData() {
+	setting = Setting{
+		SourceDir:           "./tables/",
+		SourceSuffix:        ".xlsx|.xls",
+		ExportFlag:          "C",
+		OutDir:              "./configs/",
+		ExportSuffix:        ".txt",
+		DefOutDir:           "./def/",
+		DefNamespace:        "ConfigData",
+		//ConfigNameOutDir:    "./def/",
+		//ConfigNameNamespace: "ConfigName",
+	}
+
+	tsTypeMap = map[string]string{
+		"int":          "number",
+		"float":        "number",
+		"float64":      "number",
+		"bool":         "boolean",
+		"string":       "string",
+		"interface {}": "any",
+
+		"int[]":          "number[]",
+		"float[]":        "number[]",
+		"float64[]":      "number[]",
+		"bool[]":         "boolean[]",
+		"string[]":       "string[]",
+		"[]interface {}": "any[]",
+	}
+
+	encodeMap = map[string]string{
+		" ":   "%20",
+		"\\n": "%0A",
+		"\\t": "%09",
+	}
+}
+
+/*读取启动参数*/
 func readStartupParams(args []string) {
 	if len(args) <= 1 {
 		return
 	}
-	props := []string{"SourceDir", "OutDir", "ExportFlag", "ExportSuffix", "DefOutDir", "ConfigNamespace", "ConfigNameMoveTo"}
-	begin := time.Now()
+	props := []string{"SourceDir",
+		"OutDir", "ExportFlag", "ExportSuffix",
+		"DefOutDir", "DefNamespace",
+		"ConfigNameOutDir", "ConfigNameNamespace"}
+
 	args = args[1:]
 	fmt.Println("启动参数：", args)
-	ReflectAssign(&setting, props, args)
-	fmt.Println("反射赋值耗时：", time.Since(begin))
-
+	utils.ReflectAssign(&setting, props, args)
 }
 
+/*读取excel文件*/
 func readFiles() {
-	pattern := fmt.Sprintf(`^[^~].*(%s)$`, setting.ImportSuffix)
-	efcFiles := GetEffectiveFiles(setting.SourceDir, pattern)
+	pattern := fmt.Sprintf(`^[^~].*(%s)$`, setting.SourceSuffix)
+	efcFiles := utils.GetEffectiveFiles(setting.SourceDir, pattern)
 	numExcels := len(efcFiles)
 	fmt.Printf("检测到有 %d 个excel文件待处理\n", numExcels)
 
 	if numExcels > 0 {
-		EnsureDir(setting.OutDir)
-		EnsureDir(setting.DefOutDir)
-		EnsureDir(setting.ConfigMoveTo)
-		EnsureDir(setting.DefMoveTo)
+		utils.EnsureDir(setting.OutDir)
+		utils.EnsureDir(setting.DefOutDir)
+		utils.EnsureDir(setting.ConfigNameOutDir)
 
 		begin := time.Now()
 
-		dts, dtsBuffer = GetBufferWriter(setting.DefOutDir + "config.d.ts")
+		//创建配置表定义文件 bufferWriter
+		dts, dtsBuffer = utils.GetBufferWriter(setting.DefOutDir + "config.d.ts")
 		defer dts.Close()
 		_, _ = dtsBuffer.WriteString("//由工具自动生成，请勿手动修改\n")
-		_, _ = dtsBuffer.WriteString("declare namespace " + setting.ConfigNamespace + " {")
+		_, _ = dtsBuffer.WriteString("declare namespace " + setting.DefNamespace + " {")
 		indent(1)
+
+		//创建配置表名称定义文件 bufferWriter
+		if setting.ConfigNameNamespace != "" {
+			fName, bufferName = utils.GetBufferWriter(setting.ConfigNameOutDir + "config-names.ts")
+			defer fName.Close()
+			_, _ = bufferName.WriteString("//由工具自动生成，请勿手动修改\n")
+			_, _ = bufferName.WriteString("namespace " + setting.ConfigNameNamespace + " {")
+		}
 
 		//处理每个excel表
 		for i, file := range efcFiles {
@@ -115,7 +143,11 @@ func readFiles() {
 		_, _ = dtsBuffer.WriteString(dtsConfigMapDeclare)
 		_, _ = dtsBuffer.WriteString("\n}")
 		_ = dtsBuffer.Flush()
-		CopyTo("config.d.ts", setting.DefOutDir, setting.DefMoveTo)
+
+		if bufferName != nil {
+			_, _ = bufferName.WriteString("\n}")
+			_ = bufferName.Flush()
+		}
 
 		fmt.Printf("所有excel处理完成。成功%d个,失败%d个，总任务%d个，耗时：%s\n", numExcels-failCount, failCount, numExcels, time.Since(begin))
 		if failCount > 0 {
@@ -168,7 +200,7 @@ func parseSheet(excel *excelize.File, sheet string) {
 
 	//正式开始处理
 	outPath := setting.OutDir + sheet + setting.ExportSuffix
-	file, buffer := GetBufferWriter(outPath)
+	file, buffer := utils.GetBufferWriter(outPath)
 	defer file.Close()
 
 	//文件名
@@ -199,11 +231,8 @@ func parseSheet(excel *excelize.File, sheet string) {
 		_, _ = buffer.WriteString(line)
 	}
 
-	CheckError(buffer.Flush())
-
-	CopyTo(sheet+setting.ExportSuffix, setting.OutDir, setting.ConfigMoveTo)
-	SetReadOnly(outPath)
-	SetReadOnly(setting.ConfigMoveTo + sheet + setting.ExportSuffix)
+	utils.CheckError(buffer.Flush())
+	utils.SetReadOnly(outPath)
 
 	log.Printf("导出 %s[%s] 到 %s%s 成功！\n", excel.Path, sheet, sheet, setting.ExportSuffix)
 
@@ -218,6 +247,10 @@ func parseSheet(excel *excelize.File, sheet string) {
 		_, _ = dtsBuffer.WriteString(indent(-1) + "}\n")
 	}
 	dtsConfigMapDeclare += tab + "let " + sheet + ": { [key: number]: I" + sheet + " };"
+
+	if bufferName != nil {
+		_, _ = bufferName.WriteString("\n\texport const " + sheet + ": string = \"" + sheet + "\";")
+	}
 }
 
 //获取表格中的有效列的索引
@@ -244,23 +277,19 @@ func encode(s string) string {
 	for k, v := range encodeMap {
 		s = strings.Replace(s, k, v, -1)
 	}
-	//s = strings.Replace(s, " ", "%20", -1)
-	//s = strings.Replace(s, "\\n", "%0A", -1)
-	//s = strings.Replace(s, "\\t", "%09", -1)
-	//s = strings.Replace(s, "|", "%7C", -1)
 	return s
 }
 
 //转成目标语言的类型
 func getTargetLangType(t string) string {
-	return jsTypeMap[t]
+	return tsTypeMap[t]
 }
 
 func printExcelError(path string, sheet string, err error) {
 	out := fmt.Sprintf("读取(%s[%s])出错！%s。已经忽略导出\n", path, sheet, err)
 	log.Print(out)
 	failCount++
-	failDesc += out
+	failDesc += out + "\n"
 }
 
 var tab = "\n"

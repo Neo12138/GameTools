@@ -1,6 +1,0 @@
-activity
-id|number name|string take_effect|number platform|number position|number icon|string[] delay|number type|number start|number end|number order|number hot|number parameter|string des|string
-1 1元礼包 1  1 res/1.png,res/2.png 1 1 1 999 1  10001 奖励
-2 7日签到 1  1 res/1.png,res/3.png 1 3 1 7 2   
-3 累计登陆 1  1 res/1.png,res/4.png 1 1 1 999 3   
-4 收藏有礼 1  1 res/1.png,res/5.png 1 1 1 999 4  10001 奖励

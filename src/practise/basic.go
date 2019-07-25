@@ -23,8 +23,6 @@ func Run() {
 	testConcurrent()
 }
 
-
-
 func printTitle(title string) {
 	fmt.Printf("-------%s------\n", title)
 }
@@ -45,7 +43,7 @@ func testArray() {
 	fmt.Println(c)
 }
 
-func testPointer()  {
+func testPointer() {
 	printTitle("array pointer")
 	//指针
 	var a = 10
@@ -76,12 +74,11 @@ func testPointer()  {
 	fmt.Println("交换后的x,y: ", x, y)
 }
 
-func swap(x *int, y *int){
+func swap(x *int, y *int) {
 	*x, *y = *y, *x
 }
 
-
-func testStructure(){
+func testStructure() {
 	printTitle("array struct")
 	var c Config1
 	var c2 = Config1{}
@@ -92,10 +89,11 @@ func testStructure(){
 	fmt.Println("实例化的结构体 ", c3)
 
 }
+
 type Config1 struct {
-	name string
-	id uint64
-	gender uint8
+	name    string
+	id      uint64
+	gender  uint8
 	visitor bool
 }
 
@@ -104,7 +102,7 @@ func testSlice() {
 
 	var a = make([]int, 5, 10)
 	fmt.Println(a, len(a), cap(a))
-	a = append(a, 1,2,3)
+	a = append(a, 1, 2, 3)
 	fmt.Println(a)
 	fmt.Println(a[4:])
 
@@ -115,15 +113,15 @@ func testSlice() {
 	fmt.Println(a)
 }
 
-func testRange(){
+func testRange() {
 	printTitle("test range")
 
 	//在for循环中迭代 数组，切片，集合，通道的元素
 	//对于数组，切片， 返回的是index, value
 	//对于集合，返回的是key,value
 
-	var a = [5]int{1,2,3,4,5}
-	for i,v := range a {
+	var a = [5]int{1, 2, 3, 4, 5}
+	for i, v := range a {
 		fmt.Println("数组迭代:", i, v)
 	}
 
@@ -137,18 +135,17 @@ func testRange(){
 		fmt.Println("map迭代：", k, v)
 	}
 
-	var c = map[string]string{"A":"1", "B":"2", "C":"3"}
-	for k,v := range c {
+	var c = map[string]string{"A": "1", "B": "2", "C": "3"}
+	for k, v := range c {
 		fmt.Println("map迭代2：", k, v)
 	}
 }
 
-
-func testConvert(){
+func testConvert() {
 	printTitle("test convert")
 
 	var sum = 17
-	var count  = 5
+	var count = 5
 	var mean float32
 
 	mean = float32(sum) / float32(count)
@@ -160,7 +157,6 @@ func testConvert(){
 	//int => float32 => float64
 	//fmt.Printf("float=>int %d: \n", int(12.545))
 }
-
 
 type Phone interface {
 	call()
@@ -175,6 +171,7 @@ type NokiaPhone struct {
 type IPhone struct {
 	os string
 }
+
 func (iPhone IPhone) call() {
 	iPhone.os = "iOS"
 	fmt.Println("this is iPhone, os is:", iPhone.os)
@@ -190,31 +187,31 @@ func (nokiaPhone NokiaPhone) call() {
 	nokiaPhone.name = "nokiaPhone"
 	fmt.Println("this is", nokiaPhone.name)
 }
-func (nokiaPhone NokiaPhone)  getName() string {
+func (nokiaPhone NokiaPhone) getName() string {
 	return nokiaPhone.name
 }
-func (nokiaPhone NokiaPhone)  getPrice() int {
+func (nokiaPhone NokiaPhone) getPrice() int {
 	return 3200
 }
 
-func testInterface()  {
+func testInterface() {
 	printTitle("test interface")
 
 	var phone Phone
 	phone = new(NokiaPhone)
 	phone.call()
-	fmt.Println(phone.getName(),"的价格", phone.getPrice())
+	fmt.Println(phone.getName(), "的价格", phone.getPrice())
 
 	phone = new(IPhone)
 	phone.call()
-	fmt.Println(phone.getName(),"的价格", phone.getPrice())
+	fmt.Println(phone.getName(), "的价格", phone.getPrice())
 
 }
 
 /**
  * 测试并发
  */
-func testConcurrent()  {
+func testConcurrent() {
 	printTitle("test concurrent")
 
 	//被go修饰的方法只能放在顶部执行
@@ -222,10 +219,10 @@ func testConcurrent()  {
 	//go say("2 Hi")
 	//say("3 Hello")
 
-	var t0 = time.Now();
+	var t0 = time.Now()
 	const size = 300000000
 	var a = make([]uint64, size)
-	for i:=0;i<size;i++ {
+	for i := 0; i < size; i++ {
 		a[i] = rand.Uint64() / 100
 	}
 	fmt.Println("赋值耗时：", time.Since(t0))
@@ -243,10 +240,10 @@ func testConcurrent()  {
 	var golen = 5
 	var gap = size / golen
 	for i := 0; i < golen; i++ {
-		go sum(a[gap*i: gap*(i+1)], c2)
+		go sum(a[gap*i:gap*(i+1)], c2)
 	}
 	var s2 uint64
-	for i:=0;i<golen;i++ {
+	for i := 0; i < golen; i++ {
 		s2 += <-c2
 	}
 	//var d2 = time.Since(t2)
@@ -256,13 +253,13 @@ func testConcurrent()  {
 }
 
 func say(s string) {
-	for i:=0; i<5;i++ {
+	for i := 0; i < 5; i++ {
 		time.Sleep(100 * time.Millisecond)
 		fmt.Println(s)
 	}
 }
 
-func sum(s []uint64, c chan uint64){
+func sum(s []uint64, c chan uint64) {
 	var sum uint64 = 0
 	for _, v := range s {
 		sum += v

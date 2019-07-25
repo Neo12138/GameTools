@@ -50,11 +50,11 @@ func parseSheet(xlsx *excelize.File, sheet string) {
 	// 获取 Sheet1 上所有单元格
 	rows, err := xlsx.GetRows(sheet)
 	if err != nil {
-		fmt.Printf("读取Sheet(%s[%s])时发生了错误。 %s \n",xlsx.Path, sheet, err)
+		fmt.Printf("读取Sheet(%s[%s])时发生了错误。 %s \n", xlsx.Path, sheet, err)
 		return
 	}
 	if len(rows) < 4 {
-		fmt.Printf("Sheet(%s[%s])行数不合法，少于4行。已经忽略\n",xlsx.Path, sheet)
+		fmt.Printf("Sheet(%s[%s])行数不合法，少于4行。已经忽略\n", xlsx.Path, sheet)
 		return
 	}
 
@@ -118,6 +118,7 @@ func checkErr(err error) {
 }
 
 const C = "C"
+
 var TypeMap = map[string]string{
 	"int":      "number",
 	"float":    "number",
@@ -128,7 +129,6 @@ var TypeMap = map[string]string{
 	"string[]": "string[]",
 	"bool[]":   "boolean[]",
 }
-
 
 func getJSType(t string) string {
 	return TypeMap[t]

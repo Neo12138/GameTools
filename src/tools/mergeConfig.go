@@ -85,7 +85,7 @@ func mergeReadFiles() {
 		defer source.Close()
 		_ = bWriter.Flush()
 
-		CopyTo(filename + mSetting.ImportSuffix, mSetting.OutDir, mSetting.ConfigMoveTo)
+		CopyTo(filename+mSetting.ImportSuffix, mSetting.OutDir, mSetting.ConfigMoveTo)
 		SetReadOnly(mergedFilePath)
 		SetReadOnly(mSetting.ConfigMoveTo + filename + mSetting.ImportSuffix)
 		fmt.Println("合并完成，耗时:", time.Since(begin))

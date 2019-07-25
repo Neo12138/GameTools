@@ -1,4 +1,7 @@
-package tools
+/**
+ * created by wangcheng at 2019/7/25 15:00
+ */
+package utils
 
 import (
 	"bufio"
@@ -19,11 +22,11 @@ func ReflectAssign(i interface{}, props []string, values []string) {
 	}
 }
 
+/*获取有效文件名*/
 func GetEffectiveFiles(path string, pattern string) []string {
 	files, _ := ioutil.ReadDir(path)
 	efcFiles := make([]string, 0, len(files))
 
-	//expr := fmt.Sprintf(`^[^~].*\.(%s)$`, pattern)
 	reg, _ := regexp.Compile(pattern)
 
 	for _, f := range files {
@@ -84,7 +87,7 @@ func EnsureDir(path string) {
 func GetBufferWriter(filePath string) (*os.File, *bufio.Writer) {
 	SetReadWrite(filePath)
 	file, err := os.Create(filePath)
-	fmt.Println("create ", filePath)
+	fmt.Println("create file", filePath)
 	CheckError(err)
 
 	buffer := bufio.NewWriter(file)
@@ -102,4 +105,10 @@ func SetReadOnly(path string) {
 }
 func SetReadWrite(path string) {
 	_ = os.Chmod(path, os.FileMode(0600))
+}
+
+func Pause() {
+	fmt.Print("输入任意字符结束：")
+	var enter string
+	_, _ = fmt.Scanln(&enter)
 }

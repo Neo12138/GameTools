@@ -15,10 +15,10 @@ import (
 
 func RunGetConfigDef(args []string) {
 	setting = Setting{
-		SourceDir: "./builds/,./builds2/",
-		DefOutDir: "./def/",
-		ImportSuffix: ".json",
-		ConfigNamespace: "ConfigData",
+		SourceDir:        "./builds/,./builds2/",
+		DefOutDir:        "./def/",
+		ImportSuffix:     ".json",
+		ConfigNamespace:  "ConfigData",
 		ConfigNameOutDir: "./def/",
 	}
 	getDefReadStartupParams(args)
@@ -46,9 +46,9 @@ func readJSONFiles() {
 
 	dirs := strings.Split(setting.SourceDir, ",")
 
-	paths :=make([]string, 0)
-	names :=make([]string, 0)
-	length :=0
+	paths := make([]string, 0)
+	names := make([]string, 0)
+	length := 0
 	for _, dir := range dirs {
 		fmt.Println("read dir", dir)
 		efcFiles := GetEffectiveFiles(dir, pattern)
@@ -59,12 +59,11 @@ func readJSONFiles() {
 		names = append(names, n2...)
 		//处理每个json
 		for _, file := range efcFiles {
-			paths[length] = dir+file
-			names[length] = strings.TrimSuffix(file,setting.ImportSuffix)
+			paths[length] = dir + file
+			names[length] = strings.TrimSuffix(file, setting.ImportSuffix)
 			length++
 		}
 	}
-
 
 	fmt.Printf("检测到有 %d 个json文件待处理\n", length)
 	if length == 0 {
@@ -79,7 +78,7 @@ func readJSONFiles() {
 	dts, dtsBuffer2 = GetBufferWriter(setting.DefOutDir + "config.d.ts")
 	defer dts.Close()
 	_, _ = dtsBuffer2.WriteString("//由工具自动生成，请勿手动修改\n")
-	_, _ = dtsBuffer2.WriteString("declare namespace "+setting.ConfigNamespace+" {")
+	_, _ = dtsBuffer2.WriteString("declare namespace " + setting.ConfigNamespace + " {")
 	indent(1)
 
 	cn, cnBuffer = GetBufferWriter(setting.ConfigNameOutDir + "config-names.ts")
@@ -106,17 +105,15 @@ func readJSONFiles() {
 	}
 }
 
-
-
 func parseJSON(filename string, name string) {
-	fmt.Println("\t start parse:",  name, filename)
+	fmt.Println("\t start parse:", name, filename)
 	byteValue, err := ioutil.ReadFile(filename)
 	//去除bom标志
 	byteValue = bytes.TrimPrefix(byteValue, []byte("\xef\xbb\xbf"))
 	if err != nil {
 		fmt.Println("read file error", err)
 		failCount++
-		failDesc = name+": "+err.Error()
+		failDesc = name + ": " + err.Error()
 		return
 	}
 
@@ -126,7 +123,7 @@ func parseJSON(filename string, name string) {
 	if err != nil {
 		fmt.Println("json parse error", err)
 		failCount++
-		failDesc += name+": "+err.Error()+"\n"
+		failDesc += name + ": " + err.Error() + "\n"
 		return
 	}
 
@@ -142,12 +139,10 @@ func parseJSON(filename string, name string) {
 			}
 			_, _ = dtsBuffer2.WriteString(indent(-1) + "}\n")
 		}
-		dtsConfigDeclare.WriteString( tab + "const " + name + ": I" + name + "[];")
-		_, _ = cnBuffer.WriteString("\n\texport const " + name + ": string = \"" + name+"\";")
+		dtsConfigDeclare.WriteString(tab + "const " + name + ": I" + name + "[];")
+		_, _ = cnBuffer.WriteString("\n\texport const " + name + ": string = \"" + name + "\";")
 
 		break
 	}
 
 }
-
-

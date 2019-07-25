@@ -87,9 +87,9 @@ namespace zero {
         if (type == 'boolean') return !!+value;
         value = decodeURIComponent(value);
         if (type == "string") return value;
-        if (type == "number[]") return value.split(",").map(v => +v);
-        if (type == "boolean[]") return value.split(",").map(v => v == 'true');
-        if (type == "string[]") return value.split(",");
+        if (type == "number[]") return value.split("|").map(v => +v);
+        if (type == "boolean[]") return value.split("|").map(v => v == 'true');
+        if (type == "string[]") return value.split("|");
     }
 
     // function getFileNameFromPath(path: string): string {

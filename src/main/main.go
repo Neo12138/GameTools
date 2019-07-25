@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	//tools.Run(os.Args)
+	tools.Run(os.Args)
 	//tools.RunMerge(os.Args)
 	//test()
 	//filename.Run(os.Args)
-	tools.RunGetConfigDef(os.Args)
+	//tools.RunGetConfigDef(os.Args)
 
 	fmt.Print("输入任意字符结束：")
 	var enter string

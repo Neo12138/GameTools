@@ -1,0 +1,8 @@
+Battle
+id type max min
+int int int int
+1 1 135 150
+2 2 75 90
+3 3 45 60
+4 4 20 30
+5 5 200 200
