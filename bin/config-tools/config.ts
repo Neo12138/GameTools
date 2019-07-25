@@ -38,25 +38,18 @@ namespace zero {
     function parseConfig(data: string): { config: object, filename: string } {
         let lines = data.split("\n");
         let numRow = lines.length;
-        if (numRow < 3) {
+        if (numRow < 4) {
+            console.error("数据格式不正确 filename:"+lines[0]);
             return;
         }
         //文件名
         let filename: string = lines[0];
-        //属性|类型 定义行
-        let lineNameType: string = lines[1];
+        //属性名
+        let names: string[] = lines[1].split(" ");
+        //属性类型
+        let types: string[] = lines[2].split(" ");
         //数据起始行
-        let start: number = 2;
-
-        //解析 属性名和类型
-        let types: string[] = [];
-        let names: string[] = [];
-        let nameTypes = lineNameType.split(" ");
-        for (let strNT of nameTypes) {
-            let nt = strNT.split("|");
-            names.push(nt[0]);
-            types.push(nt[1])
-        }
+        let start: number = 3;
 
         //将配置表的每一行保存到对象中，通过第一列的值映射每一行
         let config = {};
