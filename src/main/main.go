@@ -4,20 +4,22 @@ package main
 import (
 	"fmt"
 	"os"
-	"tools"
+	"utils"
 )
 
 func main() {
-	tools.Run(os.Args)
+	//tools.Run(os.Args)
 	//tools.RunMerge(os.Args)
 	//test()
 	//filename.Run(os.Args)
 	//tools.RunGetConfigDef(os.Args)
 
-	fmt.Print("输入任意字符结束：")
-	var enter string
-	fmt.Scanln(&enter)
-	fmt.Printf("%s\n", enter)
+	a := utils.StringToCamel(os.Args[1], false)
+	b := utils.StringToCamel(os.Args[1], true)
+	fmt.Printf("length: %d %d\n", len(a), len(b))
+	fmt.Println(a)
+	fmt.Println(b)
+	//utils.Pause()
 
 }
 
