@@ -203,8 +203,10 @@ func parseSheet(excel *excelize.File, sheet string) {
 	file, buffer := utils.GetBufferWriter(outPath)
 	defer file.Close()
 
+	interfaceConfig := utils.StringToCamel(sheet, true)
+	propConfig := utils.StringToCamel(sheet, false)
 	//文件名
-	_, _ = buffer.WriteString(sheet + "\n")
+	_, _ = buffer.WriteString(propConfig + "\n")
 
 	//头部
 	//var header string
@@ -214,7 +216,7 @@ func parseSheet(excel *excelize.File, sheet string) {
 	var strNames string
 	var strTypes string
 	for _, i := range effectiveColumns {
-		strNames += " " + names[i]
+		strNames += " " + utils.StringToCamel(names[i], false)
 		strTypes += " " + getTargetLangType(types[i])
 	}
 	_, _ = buffer.WriteString(strNames[1:])
@@ -236,20 +238,22 @@ func parseSheet(excel *excelize.File, sheet string) {
 
 	log.Printf("导出 %s[%s] 到 %s%s 成功！\n", excel.Path, sheet, sheet, setting.ExportSuffix)
 
+
 	//写入到dts文件
 	if dtsBuffer != nil {
-		_, _ = dtsBuffer.WriteString(tab + "interface I" + sheet + " {")
+		_, _ = dtsBuffer.WriteString(tab + "interface I" + interfaceConfig + " {")
 		indent(1)
 		for _, i := range effectiveColumns {
 			_, _ = dtsBuffer.WriteString(tab + "/** " + rows[0][i] + " */")
-			_, _ = dtsBuffer.WriteString(tab + "readonly " + names[i] + ": " + getTargetLangType(types[i]) + ";")
+			convertedName := utils.StringToCamel(names[i], false)
+			_, _ = dtsBuffer.WriteString(tab + "readonly " + convertedName + ": " + getTargetLangType(types[i]) + ";")
 		}
 		_, _ = dtsBuffer.WriteString(indent(-1) + "}\n")
 	}
-	dtsConfigMapDeclare += tab + "let " + sheet + ": { [key: number]: I" + sheet + " };"
+	dtsConfigMapDeclare += tab + "let " + propConfig + ": { [key: number]: I" + interfaceConfig + " };"
 
 	if bufferName != nil {
-		_, _ = bufferName.WriteString("\n\texport const " + sheet + ": string = \"" + sheet + "\";")
+		_, _ = bufferName.WriteString("\n\texport const " + propConfig + ": string = \"" + sheet + "\";")
 	}
 }
 

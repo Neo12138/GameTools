@@ -1,4 +1,4 @@
-Battle
+battle
 id type max min
 number number number number
 1 1 135 150

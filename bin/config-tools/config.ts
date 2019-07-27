@@ -8,7 +8,8 @@ namespace zero {
      * 合并的配置表是将每个单独的配置表文件内容合并，并通过2个换行符分隔构成的
      * 单独的配置表格式：
      * tableName
-     * nameTypeDef
+     * nameDef
+     * typeDef
      * dataRow
      *
      * @param data 配置表文件中的原始数据

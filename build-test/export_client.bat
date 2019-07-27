@@ -10,7 +10,7 @@ set OUT_DIR=./configs/
 :: 导出标志，只导出包含标志的列
 set EXPORT_FLAG=C
 :: 导出的配置表后缀
-set EXPORT_SUFFIX=.txt
+set EXPORT_SUFFIX=.csv
 :: .d.ts文件导出目录
 set DEF_OUT_DIR=./def/
 :: 配置表数据所在的名字空间

@@ -1,5 +1,5 @@
-Box
-id icon time drop_id number repeat
+box
+id icon time dropId number repeat
 number string number number number number
 10001 10001 -1 10001 8 0
 10002 10001 -1 10002 8 0
