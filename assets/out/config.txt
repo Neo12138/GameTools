@@ -1,0 +1,21 @@
+activity object_array
+number string number number number string number number number number number number string string
+id name takeEffect platform position icon delay type start end order hot parameter des
+1 1元礼包 1  1  1 1 1 999 1  10001 奖励
+2 7日签到 1  1  1 3 1 7 2
+3 累计登陆 1  1  1 1 1 999 3
+4 收藏有礼 1  1  1 1 1 999 4  10001 奖励
+battle object_array
+number number number number
+id type max min
+1 1 135 150
+2 2 75 90
+3 3 45 60
+4 4 20 30
+5 5 200 200
+playerInit object
+number hp 100
+number attack 1
+number spell_power 1
+number mp 50
+number speed 200
